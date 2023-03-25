@@ -16,11 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { migratePluginSettings } from "@api/settings";
+import { Devs } from "@utils/constants";
+import definePlugin from "@utils/types";
 
-export interface Badge {
-    name: string;
-    description: string;
-    icon: string;
-    redirectURL : string;
-    type: number;
-}
+migratePluginSettings("NoRPC", "No RPC");
+export default definePlugin({
+    name: "NoRPC",
+    description: "Disables Discord's RPC server.",
+    authors: [Devs.Cyn],
+    patches: [
+        {
+            find: '.ensureModule("discord_rpc")',
+            replacement: {
+                match: /\.ensureModule\("discord_rpc"\)\.then\(\(.+?\)\)}/,
+                replace: '.ensureModule("discord_rpc")}',
+            },
+        },
+    ],
+});

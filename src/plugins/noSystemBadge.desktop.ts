@@ -16,19 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Badge } from "./Badge";
+import { Devs } from "@utils/constants";
+import definePlugin from "@utils/types";
 
-export interface Sender {
-    id : number,
-    discordID: string,
-    username: string,
-    profilePhoto: string,
-    badges: Badge[]
-}
-
-export interface Review {
-    comment: string,
-    id: number,
-    star: number,
-    sender: Sender,
-}
+export default definePlugin({
+    name: "NoSystemBadge",
+    description: "Disables the taskbar and system tray unread count badge.",
+    authors: [Devs.rushii],
+    patches: [
+        {
+            find: "setSystemTrayApplications:function",
+            replacement: [
+                {
+                    match: /setBadge:function.+?},/,
+                    replace: "setBadge:function(){},"
+                },
+                {
+                    match: /setSystemTrayIcon:function.+?},/,
+                    replace: "setSystemTrayIcon:function(){},"
+                }
+            ]
+        }
+    ]
+});
