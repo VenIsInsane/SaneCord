@@ -32,11 +32,10 @@ const EditIcon = findByCodeLazy("M19.2929 9.8299L19.9409 9.18278C21.353 7.77064 
 const DeleteIcon = findByCodeLazy("M15 3.999V2H9V3.999H3V5.999H21V3.999H15Z");
 const classNames = findByPropsLazy("customStatusSection");
 
-import { timezones } from "./all_timezones";
 import { API_URL, DATASTORE_KEY, getTimeString, getUserTimezone, TimezoneDB } from "./Utils";
 const styles = findByPropsLazy("timestampInline");
 
-
+let timezones: string[] = [];
 
 export default definePlugin({
     name: "Timezones",
@@ -189,6 +188,20 @@ export default definePlugin({
             }
         }
     ],
+    start() {
+        DataStore.get("TIMEZONES").then(data => {
+            if (!data) {
+                fetch("https://gist.githubusercontent.com/lewisakura/529bb0236f375ab0b5890de02a8c007a/raw/ff5930de4d8b6a77e32bba3d1f8b822a80286493/timezones.json")
+                    .then(res => res.json())
+                    .then(data => {
+                        DataStore.set(DATASTORE_KEY, data);
+                        timezones = data;
+                    });
+                return;
+            }
+            timezones = data;
+        });
+    },
 
     getProfileTimezonesComponent: (e: any) => {
         const user = e.user as User;

@@ -25,43 +25,44 @@ const API_URL = "https://manti.vendicated.dev";
 
 const getToken = () => Settings.plugins.ReviewDB.token;
 
-enum Response {
-    "Added your review" = 0,
-    "Updated your review" = 1,
-    "Error" = 2,
+interface Response {
+    success: boolean,
+    message: string
+    reviews: Review[]
+    updated: boolean
 }
 
 export async function getReviews(id: string): Promise<Review[]> {
-    const res = await fetch(API_URL + "/getUserReviews?snowflakeFormat=string&discordid=" + id);
-    return await res.json() as Review[];
+    const res = await fetch(API_URL + `/api/reviewdb/users/${id}/reviews?snowflakeFormat=string`);
+    return (await res.json()).reviews as Review[];
 }
 
-export async function addReview(review: any): Promise<Response> {
+export async function addReview(review: any): Promise<Response | null> {
     review.token = getToken();
 
     if (!review.token) {
         showToast("Please authorize to add a review.");
         authorize();
-        return Response.Error;
+        return null;
     }
 
-    return fetch(API_URL + "/addUserReview", {
-        method: "POST",
+    return fetch(API_URL + `/api/reviewdb/users/${review.userid}/reviews`, {
+        method: "PUT",
         body: JSON.stringify(review),
         headers: {
             "Content-Type": "application/json",
         }
     })
-        .then(r => r.text())
+        .then(r => r.json())
         .then(res => {
-            showToast(res);
-            return Response[res] ?? Response.Error;
+            showToast(res.message);
+            return res ?? null;
         });
 }
 
 export function deleteReview(id: number): Promise<any> {
-    return fetch(API_URL + "/deleteReview", {
-        method: "POST",
+    return fetch(API_URL + `/api/reviewdb/users/${id}/reviews`, {
+        method: "DELETE",
         headers: new Headers({
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -74,8 +75,8 @@ export function deleteReview(id: number): Promise<any> {
 }
 
 export async function reportReview(id: number) {
-    const res = await fetch(API_URL + "/reportReview", {
-        method: "POST",
+    const res = await fetch(API_URL + "/api/reviewdb/reports", {
+        method: "PUT",
         headers: new Headers({
             "Content-Type": "application/json",
             Accept: "application/json",

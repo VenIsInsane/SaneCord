@@ -41,13 +41,13 @@ export default LazyComponent(() => {
         p("container", "isHeader"),
         p("avatar", "zalgo"),
         p("contents"),
-        p("button", "wrapper", "disabled"),
+        p("button", "wrapper", "selected"),
         p("defaultColor")
     );
 
     return function ReviewComponent({ review, refetch }: { review: Review; refetch(): void; }) {
         function openModal() {
-            openUserProfileModal(review.senderdiscordid);
+            openUserProfileModal(review.sender.discordID);
         }
 
         function delReview() {
@@ -91,7 +91,7 @@ export default LazyComponent(() => {
                     <img
                         className={classes(avatar, clickable)}
                         onClick={openModal}
-                        src={review.profile_photo || "/assets/1f0bfc0865d324c2587920a7d80c609b.png?size=128"}
+                        src={review.sender.profilePhoto || "/assets/1f0bfc0865d324c2587920a7d80c609b.png?size=128"}
                         style={{ left: "0px" }}
                     />
                     <span
@@ -99,9 +99,9 @@ export default LazyComponent(() => {
                         style={{ color: "var(--channels-default)", fontSize: "14px" }}
                         onClick={() => openModal()}
                     >
-                        {review.username}
+                        {review.sender.username}
                     </span>
-                    {review.badges.map(badge => <ReviewBadge {...badge} />)}
+                    {review.sender.badges.map(badge => <ReviewBadge {...badge} />)}
                     <p
                         className={classes(messageContent, defaultColor)}
                         style={{ fontSize: 15, marginTop: 4 }}

@@ -20,7 +20,7 @@ import { classes, LazyComponent } from "@utils/misc";
 import { findByProps } from "@webpack";
 
 export default LazyComponent(() => {
-    const { button, dangerous } = findByProps("button", "wrapper", "disabled");
+    const { button, dangerous } = findByProps("button", "wrapper", "disabled","separator");
 
     return function MessageButton(props) {
         return props.type === "delete"
